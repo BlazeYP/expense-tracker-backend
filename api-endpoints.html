@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101b2d">
+<title>Finance Tracker API — Endpoint Guide</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#111d30;--panel2:#16243a;--line:#293a52;--text:#ecf3fb;--muted:#a9bad0;--cyan:#68e0d0;--blue:#91baff;--gold:#ffc978;--red:#ff9a9a;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 80% 0%,#193452 0,transparent 38%),var(--bg);color:var(--text);font:16px/1.58 var(--sans)}a{color:var(--cyan)}.wrap{max-width:1180px;margin:auto;padding:32px 26px 90px}.hero{padding:62px 0 42px;border-bottom:1px solid var(--line)}.eyebrow{text-transform:uppercase;letter-spacing:.16em;color:var(--cyan);font-size:.76rem;font-weight:750}.hero h1{font-size:clamp(2.4rem,6vw,4.8rem);line-height:1.02;letter-spacing:-.055em;max-width:850px;margin:16px 0}.hero p{font-size:1.12rem;color:var(--muted);max-width:740px}.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px}.chip{border:1px solid var(--line);background:#101c2d;border-radius:999px;padding:6px 12px;color:#d5e3f2;font-size:.86rem}.intro-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:25px 0 45px}.intro-grid div,.note,.card{background:linear-gradient(150deg,var(--panel),#0f1928);border:1px solid var(--line);border-radius:16px}.intro-grid div{padding:17px}.intro-grid b{display:block;color:var(--cyan);font-size:.8rem;text-transform:uppercase;letter-spacing:.09em;margin-bottom:7px}.intro-grid span{color:var(--muted)}nav{display:flex;gap:8px;flex-wrap:wrap;margin:28px 0 45px}nav a{font-size:.88rem;text-decoration:none;padding:7px 12px;border:1px solid var(--line);border-radius:999px;color:#dce8f5}nav a:hover{border-color:var(--cyan);color:var(--cyan)}section{scroll-margin-top:20px;margin:48px 0}.section-head{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:18px}.section-head h2{font-size:1.85rem;letter-spacing:-.03em;margin:0}.section-head p{color:var(--muted);margin:0;max-width:620px}.card{padding:22px;margin:14px 0;overflow:hidden}.card-top{display:flex;align-items:center;gap:11px;flex-wrap:wrap}.verb{font:750 .78rem var(--mono);padding:5px 9px;border-radius:6px;letter-spacing:.04em;background:#25364d;color:#fff}.get{background:#173d3c;color:#8ef0d4}.post{background:#41351d;color:#ffd991}.put{background:#213a58;color:#a9caff}.patch{background:#41305b;color:#d0b2ff}.delete{background:#4c292c;color:#ffb0b0}.path{font:600 1rem var(--mono);overflow-wrap:anywhere}.summary{color:var(--muted);margin:9px 0 15px}.meta{display:grid;grid-template-columns:130px 1fr;gap:6px 14px;border-top:1px solid var(--line);padding-top:14px}.label{color:#8ea5bf;font-size:.83rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700}.content{min-width:0}.content p{margin:0 0 8px}.fields{color:#d5e2f1}.fields code,.inline{font: .92em var(--mono);color:#c0d7ff}.json{position:relative;background:#08111e;border:1px solid #213149;border-radius:10px;padding:14px 16px;margin:10px 0 2px;overflow:auto;white-space:pre;color:#c4d8ed;font: .86rem/1.55 var(--mono)}.caption{font-size:.82rem;color:#93a7be;margin-top:8px}.note{padding:17px 20px;margin:18px 0;color:var(--muted)}.note strong{color:var(--text)}.note h3{color:var(--gold);margin:0 0 6px}.endpoint-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.92rem}.endpoint-table th,.endpoint-table td{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--line)}.endpoint-table th{color:var(--cyan);font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}.endpoint-table td:first-child{font-family:var(--mono);white-space:nowrap}.footer{border-top:1px solid var(--line);padding-top:20px;color:var(--muted);font-size:.88rem}.small{font-size:.9rem;color:var(--muted)}@media(max-width:760px){.wrap{padding:20px 15px 60px}.intro-grid{grid-template-columns:1fr}.section-head{display:block}.section-head p{margin-top:8px}.meta{grid-template-columns:1fr;gap:3px}.label{margin-top:10px}.endpoint-table{font-size:.8rem}.endpoint-table th,.endpoint-table td{padding:7px 5px}.endpoint-table td:first-child{white-space:normal}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="hero">
+<div class="eyebrow">Backend API field guide · Finance Tracker</div>
+<h1>Every endpoint,<br>clearly explained.</h1>
+<p>A practical reference to the REST API: what each route accepts, what it returns, and how the finance tracker uses it.</p>
+<div class="chips"><span class="chip">Base URL <code>http://localhost:8080</code></span><span class="chip">API prefix <code>/api/v1</code></span><span class="chip">JSON unless stated otherwise</span><span class="chip">21 routes</span></div>
+</header>
+<div class="intro-grid"><div><b>Typical flow</b><span>Set up categories and rules → import a statement → review transactions → view analytics.</span></div><div><b>Response shape</b><span>Controllers return model objects/lists directly. Errors are JSON objects with an <code>error</code> string.</span></div><div><b>Conventions</b><span>IDs are MongoDB string IDs; timestamps are ISO-8601 instants; amounts are decimal numbers.</span></div></div>
+<nav aria-label="Endpoint groups"><a href="#transactions">Transactions</a><a href="#imports">Imports</a><a href="#analytics">Analytics</a><a href="#categories">Categories</a><a href="#merchants">Merchants</a><a href="#rules">Rules</a><a href="#accounts">Accounts</a><a href="#errors">Errors & conventions</a></nav>
+
+<section id="transactions"><div class="section-head"><h2>01 · Transactions</h2><p>Browse stored transactions, inspect one record, or adjust its category assignment.</p></div>
+<article class="card"><div class="card-top"><span class="verb get">GET</span><code class="path">/api/v1/transactions</code></div><p class="summary">List every transaction currently stored.</p><div class="meta"><div class="label">Request</div><div class="content"><p>No body or query parameters.</p></div><div class="label">Response</div><div class="content"><p>JSON array of transaction records. Each record includes:</p><div class="fields"><code>id</code>, <code>source</code>, <code>transactionDateTime</code>, <code>type</code> (<code>DEBIT</code>/<code>CREDIT</code>), <code>amount</code>, <code>currency</code>, <code>description</code>, <code>upiTransactionId</code>, <code>importBatchId</code>, nested <code>counterparty</code>, <code>account</code>, <code>category</code>, <code>categorization</code>, <code>deduplicationHash</code>, <code>originalData</code>, <code>createdAt</code>, <code>updatedAt</code>.</div></div></div></article>
+<article class="card"><div class="card-top"><span class="verb get">GET</span><code class="path">/api/v1/transactions/{id}</code></div><p class="summary">Fetch the full transaction record for one ID.</p><div class="meta"><div class="label">Request</div><div class="content"><p>Path parameter <code class="inline">id</code>. No body.</p></div><div class="label">Response</div><div class="content"><p>One transaction object, with the same fields as the list response. Unknown ID returns <code>404</code> with <code>{"error":"Transaction not found"}</code>.</p></div></div></article>
+<article class="card"><div class="card-top"><span class="verb patch">PATCH</span><code class="path">/api/v1/transactions/{id}/category</code></div><p class="summary">Set a user's chosen category on a transaction. This marks the categorization as manually overridden.</p><div class="meta"><div class="label">Request</div><div class="content"><p>Path parameter <code class="inline">id</code>; JSON body:</p><pre class="json">{"categoryId":"&lt;active-category-id&gt;"}</pre></div><div class="label">Response</div><div class="content"><p>Updated transaction object. Its category source is <code>MANUAL</code>, confidence is <code>1</code>, and <code>manuallyOverridden</code> is <code>true</code>. Transaction or active category missing → <code>404</code>.</p></div></div></article>
+<article class="card"><div class="card-top"><span class="verb post">POST</span><code class="path">/api/v1/transactions/{id}/recategorize</code></div><p class="summary">Run the categorization logic again using merchant mappings, rules, then a fallback category.</p><div class="meta"><div class="label">Request</div><div class="content"><p>Path parameter <code class="inline">id</code>. No body.</p></div><div class="label">Response</div><div class="content"><p>Updated transaction object with refreshed <code>category</code> and <code>categorization</code> details. An existing manual override is preserved by the categorizer.</p></div></div></article>
+<article class="card"><div class="card-top"><span class="verb post">POST</span><code class="path">/api/v1/transactions/recategorize</code></div><p class="summary">Recategorize transactions with a missing category or the <code>DEFAULT</code> source, using current merchant mappings and active rules.</p><div class="meta"><div class="label">Request</div><div class="content"><p>No body or query parameters.</p></div><div class="label">Response</div><div class="content"><p>Counts for <code>scanned</code>, <code>assignedByRule</code>, <code>assignedByMerchant</code>, and <code>leftAtDefault</code>. Categories that remain unmatched keep the configured fallback category. Manually assigned and AI categories are not selected.</p></div></div></article>
+<article class="card"><div class="card-top"><span class="verb post">POST</span><code class="path">/api/v1/transactions/ai-recategorize</code></div><p class="summary">Ask the configured LLM to categorize a bounded batch of stored transactions. Manual overrides are always skipped.</p><div class="meta"><div class="label">Request</div><div class="content"><p>Optional JSON body; omitted fields use the shown defaults. <code>limit</code> is capped by server configuration (100 by default).</p><pre class="json">{
+  "limit": 100,
+  "minimumConfidence": 0.7,
+  "dryRun": true,
+  "onlyDefaultCategory": true
+}</pre><p>By default, only fallback/default-category transactions are candidates. Set <code>onlyDefaultCategory</code> false to include rule/merchant categories. <code>dryRun</code> returns suggestions without writing.</p></div><div class="label">Response</div><div class="content"><pre class="json">{
+  "scanned": 20,
+  "processed": 20,
+  "updated": 0,
+  "proposed": 17,
+  "skipped": 2,
+  "failed": 1,
+  "dryRun": true,
+  "results": [{
+    "transactionId": "&lt;id&gt;",
+    "categoryId": "&lt;active-category-id&gt;",
+    "categoryName": "Dining",
+    "confidence": 0.91,
+    "reason": "Restaurant merchant",
+    "status": "PROPOSED"
+  }]
+}</pre><p>Statuses are <code>UPDATED</code>, <code>PROPOSED</code>, <code>LOW_CONFIDENCE</code>, or <code>FAILED</code>. Only valid active category IDs above the confidence threshold are saved; saved categories use source <code>AI</code>. AI must be enabled and configured, otherwise the endpoint returns <code>503</code>.</p></div></div></article>
+<div class="note"><strong>Transaction subobjects:</strong> <code>counterparty</code> carries <code>originalName</code>, <code>normalizedName</code>, <code>upiId</code>; <code>account</code> has <code>accountId</code>, <code>bankName</code>, <code>last4</code>; <code>category</code> has <code>categoryId</code>, <code>categoryName</code>, <code>source</code> (including <code>AI</code>), <code>ruleId</code>, <code>confidence</code>, <code>manuallyOverridden</code>, and optional <code>reason</code>. <code>categorization</code> has source, ruleId, confidence, categorizedAt.</div>
+</section>
+
+<section id="imports"><div class="section-head"><h2>02 · Statement import</h2><p>Upload one Google Pay statement. This endpoint consumes multipart form data, not JSON.</p></div>
+<article class="card"><div class="card-top"><span class="verb post">POST</span><code class="path">/api/v1/imports/gpay</code></div><p class="summary">Parse a GPay CSV or PDF statement, deduplicate transactions, categorize new records, and report import totals.</p><div class="meta"><div class="label">Request</div><div class="content"><p><code>Content-Type: multipart/form-data</code>; one required part named <code>file</code>. Accepted formats: GPay CSV/PDF. Maximum file/request size: 15 MB.</p><pre class="json">curl -X POST http://localhost:8080/api/v1/imports/gpay \\
+  -F 'file=@statement.pdf;type=application/pdf'</pre></div><div class="label">Response</div><div class="content"><p>Import batch object:</p><pre class="json">{
+  "id": "&lt;batch-id&gt;",
+  "source": "GPAY",
+  "fileName": "statement.pdf",
+  "fileHash": "&lt;sha256&gt;",
+  "statementPeriodStart": "2026-03-01",
+  "statementPeriodEnd": "2026-08-31",
+  "status": "COMPLETED",
+  "totalRows": 42,
+  "parsedRows": 40,
+  "importedRows": 38,
+  "duplicateRows": 2,
+  "failedRows": 0,
+  "errors": [],
+  "startedAt": "2026-09-01T10:00:00Z",
+  "completedAt": "2026-09-01T10:00:03Z",
+  "createdAt": "2026-09-01T10:00:00Z"
+}</pre><p class="small">Period fields may be null when unavailable. Status is <code>PROCESSING</code>, <code>COMPLETED</code>, <code>PARTIAL_SUCCESS</code>, or <code>FAILED</code>. Re-uploading the same file returns its previous batch unless that batch failed.</p></div></div></article>
+</section>
+
+<section id="analytics"><div class="section-head"><h2>03 · Analytics</h2><p>Aggregate transaction amounts for an inclusive calendar-date range.</p></div>
+<article class="card"><div class="card-top"><span class="verb get">GET</span><code class="path">/api/v1/analytics/summary?from={date}&amp;to={date}</code></div><p class="summary">Return debit/credit totals, net flow, transaction count, and amount by category.</p><div class="meta"><div class="label">Request</div><div class="content"><p>Required query parameters <code>from</code> and <code>to</code> as ISO dates (<code>YYYY-MM-DD</code>). <code>to</code> must be on or after <code>from</code>. Date boundaries use configured business timezone (default Asia/Kolkata).</p><pre class="json">GET /api/v1/analytics/summary?from=2026-03-01&amp;to=2026-08-31</pre></div><div class="label">Response</div><div class="content"><pre class="json">{
+  "from": "2026-03-01",
+  "to": "2026-08-31",
+  "transactionCount": 42,
+  "debits": 12500.00,
+  "credits": 9000.00,
+  "net": -3500.00,
+  "amountByCategory": {
+    "Food": 3200.00,
+    "Uncategorized": 450.00
+  }
+}</pre><p><code>net = credits − debits</code>. The category map includes both debit and credit amounts; missing category names are grouped as <code>Uncategorized</code>.</p></div></div></article>
+<article class="card"><div class="card-top"><span class="verb get">GET</span><code class="path">/api/v1/analytics/monthly?year={year}</code></div><p class="summary">Return gross transaction amount, debit total, and credit total for each month in the requested calendar year.</p><div class="meta"><div class="label">Request</div><div class="content"><p>Required query parameter <code>year</code> (1–9998). Month boundaries use configured business timezone (default Asia/Kolkata). All 12 months are included; months without transactions have zero totals.</p><pre class="json">GET /api/v1/analytics/monthly?year=2026</pre></div><div class="label">Response</div><div class="content"><pre class="json">{
+  "year": 2026,
+  "months": [
+    {
+      "month": 1,
+      "monthName": "JANUARY",
+      "totalTransactionAmount": 1500.00,
+      "totalDebits": 1200.00,
+      "totalCredits": 300.00
+    }
+  ]
+}</pre><p><code>totalTransactionAmount</code> is the sum of debit and credit transaction amounts. The <code>months</code> array contains all calendar months in order.</p></div></div></article>
+</section>
+
+<section id="categories"><div class="section-head"><h2>04 · Categories</h2><p>Maintain the category taxonomy used for labeling transactions.</p></div>
+<article class="card"><div class="card-top"><span class="verb get">GET</span><code class="path">/api/v1/categories</code></div><p class="summary">List all category records (active and inactive).</p><div class="meta"><div class="label">Request</div><div class="content">No body or parameters.</div><div class="label">Response</div><div class="content">JSON array of category objects.</div></div></article>
+<article class="card"><div class="card-top"><span class="verb post">POST</span><code class="path">/api/v1/categories</code></div><p class="summary">Create a category.</p><div class="meta"><div class="label">Request</div><div class="content"><p>JSON category fields:</p><pre class="json">{
+  "name": "Dining",
+  "description": "Restaurants and cafes",
+  "transactionType": "DEBIT",
+  "parentCategoryId": null,
+  "active": true,
+  "systemDefined": false
+}</pre><p><code>name</code> is required and cannot be blank. Server assigns ID and timestamps.</p></div><div class="label">Response</div><div class="content">Created category object with <code>id</code>, submitted fields, and <code>createdAt</code>/<code>updatedAt</code>. Blank name → <code>400</code>.</div></div></article>
+<article class="card"><div class="card-top"><span class="verb put">PUT</span><code class="path">/api/v1/categories/{id}</code></div><p class="summary">Replace editable category properties for an existing category.</p><div class="meta"><div class="label">Request</div><div class="content"><p>Path <code>id</code>; JSON fields <code>name</code>, <code>description</code>, <code>transactionType</code>, <code>parentCategoryId</code>, <code>active</code>. Treat as a full update because omitted values are assigned from the request object.</p></div><div class="label">Response</div><div class="content">Updated category object. Missing ID → <code>404</code>.</div></div></article>
+<article class="card"><div class="card-top"><span class="verb delete">DELETE</span><code class="path">/api/v1/categories/{id}</code></div><p class="summary">Deactivate the category (soft delete); the record remains in storage.</p><div class="meta"><div class="label">Request</div><div class="content">Path <code>id</code>. No body.</div><div class="label">Response</div><div class="content">Empty response body on success. Missing ID → <code>404</code>.</div></div></article>
+<div class="note"><strong>Category object:</strong> <code>id</code>, <code>name</code>, <code>description</code>, <code>transactionType</code>, <code>parentCategoryId</code>, <code>active</code>, <code>systemDefined</code>, <code>createdAt</code>, <code>updatedAt</code>.</div>
+</section>
+
+<section id="merchants"><div class="section-head"><h2>05 · Merchants</h2><p>Map a normalized counterparty name and aliases to a default category.</p></div>
+<article class="card"><div class="card-top"><span class="verb get">GET</span><code class="path">/api/v1/merchants</code></div><p class="summary">List all merchant records.</p><div class="meta"><div class="label">Request</div><div class="content">No body or parameters.</div><div class="label">Response</div><div class="content">JSON array of merchant objects.</div></div></article>
+<article class="card"><div class="card-top"><span class="verb post">POST</span><code class="path">/api/v1/merchants</code></div><p class="summary">Create a merchant mapping.</p><div class="meta"><div class="label">Request</div><div class="content"><pre class="json">{
+  "originalName": "Acme Foods Pvt Ltd",
+  "defaultCategoryId": "&lt;category-id&gt;",
+  "aliases": ["Acme Foods", "Acme Cafe"],
+  "active": true
+}</pre><p><code>originalName</code> is required; <code>normalizedName</code> is generated from it. ID is generated by the server.</p></div><div class="label">Response</div><div class="content">Saved merchant object including generated <code>id</code>, normalized name, and timestamps. Blank name → <code>400</code>.</div></div></article>
+<article class="card"><div class="card-top"><span class="verb put">PUT</span><code class="path">/api/v1/merchants/{id}</code></div><p class="summary">Save merchant data under the supplied ID (upsert-style repository save).</p><div class="meta"><div class="label">Request</div><div class="content">Path <code>id</code>; JSON fields <code>originalName</code> (required), <code>defaultCategoryId</code>, <code>aliases</code>, <code>active</code>. Normalized name is recalculated.</div><div class="label">Response</div><div class="content">Saved merchant object including its ID and timestamps.</div></div></article>
+<div class="note"><strong>Merchant object:</strong> <code>id</code>, <code>originalName</code>, <code>normalizedName</code>, <code>defaultCategoryId</code>, <code>aliases</code> (string array), <code>active</code>, <code>createdAt</code>, <code>updatedAt</code>.</div>
+</section>
+
+<section id="rules"><div class="section-head"><h2>06 · Categorization rules</h2><p>Apply conditional matches to assign a category, ordered by ascending priority.</p></div>
+<article class="card"><div class="card-top"><span class="verb get">GET</span><code class="path">/api/v1/rules</code></div><p class="summary">List all categorization rule records.</p><div class="meta"><div class="label">Request</div><div class="content">No body or parameters.</div><div class="label">Response</div><div class="content">JSON array of rule objects.</div></div></article>
+<article class="card"><div class="card-top"><span class="verb post">POST</span><code class="path">/api/v1/rules</code></div><p class="summary">Create a rule. At least one condition and a category ID are required.</p><div class="meta"><div class="label">Request</div><div class="content"><pre class="json">{
+  "name": "Coffee shops",
+  "categoryId": "&lt;category-id&gt;",
+  "transactionType": "DEBIT",
+  "priority": 20,
+  "active": true,
+  "conditions": [
+    {"field":"DESCRIPTION", "operator":"CONTAINS", "value":"coffee"}
+  ]
+}</pre><p>Supported fields: <code>DESCRIPTION</code>, <code>COUNTERPARTY_NAME</code>, <code>NORMALIZED_MERCHANT</code>, <code>UPI_ID</code>, <code>TRANSACTION_TYPE</code>, <code>AMOUNT</code>. Operators: <code>EQUALS</code>, <code>CONTAINS</code>, <code>STARTS_WITH</code>, <code>ENDS_WITH</code>, <code>REGEX</code>. All conditions in a rule must match.</p></div><div class="label">Response</div><div class="content">Saved rule object with generated <code>id</code> and timestamps. Missing category ID or empty conditions → <code>400</code>.</div></div></article>
+<article class="card"><div class="card-top"><span class="verb put">PUT</span><code class="path">/api/v1/rules/{id}</code></div><p class="summary">Save rule fields under the supplied ID (upsert-style repository save).</p><div class="meta"><div class="label">Request</div><div class="content">Path <code>id</code>; JSON rule shape as above: <code>name</code>, <code>categoryId</code>, <code>transactionType</code>, <code>priority</code>, <code>active</code>, <code>conditions</code>. The create-only validation is not repeated here.</div><div class="label">Response</div><div class="content">Saved rule object.</div></div></article>
+<article class="card"><div class="card-top"><span class="verb delete">DELETE</span><code class="path">/api/v1/rules/{id}</code></div><p class="summary">Permanently delete a rule by ID.</p><div class="meta"><div class="label">Request</div><div class="content">Path <code>id</code>. No body.</div><div class="label">Response</div><div class="content">Empty response body on success.</div></div></article>
+<div class="note"><strong>Rule object:</strong> <code>id</code>, <code>name</code>, <code>categoryId</code>, <code>transactionType</code>, <code>priority</code> (default 100), <code>active</code> (default true), <code>conditions</code> (array of <code>{field, operator, value}</code>), <code>createdAt</code>, <code>updatedAt</code>. Merchant matches are checked before rules; rules are checked in priority order.</div>
+</section>
+
+<section id="accounts"><div class="section-head"><h2>07 · Accounts</h2><p>Maintain bank/account metadata used by the application.</p></div>
+<article class="card"><div class="card-top"><span class="verb get">GET</span><code class="path">/api/v1/accounts</code></div><p class="summary">List all account records.</p><div class="meta"><div class="label">Request</div><div class="content">No body or parameters.</div><div class="label">Response</div><div class="content">JSON array of account objects.</div></div></article>
+<article class="card"><div class="card-top"><span class="verb post">POST</span><code class="path">/api/v1/accounts</code></div><p class="summary">Create an account record.</p><div class="meta"><div class="label">Request</div><div class="content"><pre class="json">{
+  "provider": "UPI",
+  "bankName": "Example Bank",
+  "accountType": "SAVINGS",
+  "last4": "1234",
+  "currency": "INR",
+  "active": true
+}</pre><p>All fields are optional in the controller/model. <code>last4</code> is normalized to digits and truncated to the last four; timestamps and ID are set by the server.</p></div><div class="label">Response</div><div class="content">Saved account object.</div></div></article>
+<article class="card"><div class="card-top"><span class="verb put">PUT</span><code class="path">/api/v1/accounts/{id}</code></div><p class="summary">Update an existing account.</p><div class="meta"><div class="label">Request</div><div class="content">Path <code>id</code>; JSON fields <code>provider</code>, <code>bankName</code>, <code>accountType</code>, <code>last4</code>, <code>currency</code>, <code>active</code>. Send the complete editable representation: values are copied as supplied.</div><div class="label">Response</div><div class="content">Updated account object. Missing ID → <code>404</code>. Unlike create, update does not normalize <code>last4</code>.</div></div></article>
+<div class="note"><strong>Account object:</strong> <code>id</code>, <code>provider</code>, <code>bankName</code>, <code>accountType</code>, <code>last4</code>, <code>currency</code> (default <code>INR</code>), <code>active</code> (default true), <code>createdAt</code>, <code>updatedAt</code>.</div>
+</section>
+
+<section id="errors"><div class="section-head"><h2>Errors & conventions</h2><p>Shared behavior from the API exception handler and application configuration.</p></div>
+<div class="note"><h3>Common error payload</h3><pre class="json">{"error":"Human-readable explanation"}</pre><p>Validation/argument errors and duplicate-key errors return <code>400</code>; missing resources explicitly checked by controllers return <code>404</code>; oversized upload returns <code>413</code>; unexpected server errors return <code>500</code> with a generic message. Invalid analytics date order is a <code>400</code>.</p></div>
+<ul class="small"><li>All routes use <code>/api/v1</code>. JSON endpoints accept and return JSON unless specified.</li><li>Collection GET routes currently return all records; pagination and filtering are not defined.</li><li>Model fields are returned directly, including nested model fields and server-managed metadata.</li><li>Import duplicate-file detection uses the uploaded file hash. Individual transaction deduplication is also performed.</li><li>API calls from localhost and 127.0.0.1 origins are allowed by the current CORS configuration.</li></ul>
+</section>
+<footer class="footer">Prepared from the Spring Boot route controllers, domain models, and service logic in this project. Use <code>/swagger-ui.html</code> on the running server for interactive API exploration.</footer>
+</main>
+</body>
+</html>
