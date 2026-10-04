@@ -11,6 +11,7 @@ import com.example.finance.categorization.model.CategorizationRule;
 import com.example.finance.categorization.repository.RuleRepository;
 import com.example.finance.categorization.service.CategorizationService;
 import com.example.finance.category.repository.CategoryRepository;
+import com.example.finance.common.security.CurrentUser;
 import com.example.finance.transaction.model.Transaction;
 import com.example.finance.transaction.repository.TransactionRepository;
 
@@ -35,17 +36,17 @@ public class TransactionService {
     }
 
     public List<Transaction> findAll() {
-        return transactionRepository.findAll();
+        return transactionRepository.findAllByUserId(CurrentUser.id());
     }
 
     public Transaction findById(String id) {
-        return transactionRepository.findById(id)
+        return transactionRepository.findByIdAndUserId(id, CurrentUser.id())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
     }
 
     public Transaction overrideCategory(String id, String categoryId) {
         Transaction transaction = findById(id);
-        var category = categoryRepository.findById(categoryId)
+        var category = categoryRepository.findByIdAndUserId(categoryId, CurrentUser.id())
                 .filter(existing -> existing.active)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Active category not found"));
 
@@ -77,8 +78,8 @@ public class TransactionService {
     }
 
     public BulkRecategorizeResult recategorizeUncategorized() {
-        List<Transaction> transactions = transactionRepository.findUncategorized();
-        List<CategorizationRule> rules = ruleRepository.findByActiveTrueOrderByPriorityAsc();
+        List<Transaction> transactions = transactionRepository.findUncategorizedByUserId(CurrentUser.id());
+        List<CategorizationRule> rules = ruleRepository.findByUserIdAndActiveTrueOrderByPriorityAsc(CurrentUser.id());
         Instant categorizedAt = Instant.now();
         int assignedByRule = 0;
         int assignedByMerchant = 0;

@@ -10,6 +10,7 @@ public class Category {
 
     @Id
     public String id;
+    public String userId;
     public String name;
     public String description;
     public String transactionType;

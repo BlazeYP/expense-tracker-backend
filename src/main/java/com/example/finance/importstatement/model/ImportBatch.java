@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("import_batches")
@@ -14,10 +13,10 @@ public class ImportBatch {
 
     @Id
     public String id;
+    public String userId;
     public String source;
     public String fileName;
 
-    @Indexed(unique = true)
     public String fileHash;
 
     public LocalDate statementPeriodStart;

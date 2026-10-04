@@ -10,6 +10,7 @@ public class Account {
 
     @Id
     public String id;
+    public String userId;
     public String provider;
     public String bankName;
     public String accountType;

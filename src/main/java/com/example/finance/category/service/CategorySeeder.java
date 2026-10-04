@@ -2,15 +2,13 @@ package com.example.finance.category.service;
 
 import java.util.List;
 
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import com.example.finance.category.model.Category;
 import com.example.finance.category.repository.CategoryRepository;
 
 @Component
-public class CategorySeeder implements ApplicationRunner {
+public class CategorySeeder {
 
     private static final List<String> DEFAULT_CATEGORY_NAMES = List.of(
             "Food & Dining",
@@ -43,21 +41,24 @@ public class CategorySeeder implements ApplicationRunner {
     );
 
     private final CategoryRepository categoryRepository;
-
     public CategorySeeder(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
 
-    @Override
-    public void run(ApplicationArguments args) {
+    public void seedDefaults(String userId) {
         for (String name : DEFAULT_CATEGORY_NAMES) {
-            if (categoryRepository.findByNameIgnoreCase(name).isEmpty()) {
+            if (categoryRepository.findByUserIdAndNameIgnoreCase(userId, name).isEmpty()) {
                 Category category = new Category();
+                category.userId = userId;
                 category.name = name;
                 category.systemDefined = true;
                 category.active = true;
                 categoryRepository.save(category);
             }
         }
+    }
+
+    public boolean needsSeeding(String userId) {
+        return categoryRepository.findByUserIdAndNameIgnoreCase(userId, "Other").isEmpty();
     }
 }

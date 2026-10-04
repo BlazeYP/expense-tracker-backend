@@ -12,6 +12,7 @@ public class CategorizationRule {
 
     @Id
     public String id;
+    public String userId;
     public String name;
     public String categoryId;
     public String transactionType;

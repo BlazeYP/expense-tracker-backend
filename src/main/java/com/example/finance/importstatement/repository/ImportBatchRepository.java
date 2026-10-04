@@ -8,5 +8,5 @@ import com.example.finance.importstatement.model.ImportBatch;
 
 public interface ImportBatchRepository extends MongoRepository<ImportBatch, String> {
 
-    Optional<ImportBatch> findByFileHash(String hash);
+    Optional<ImportBatch> findByUserIdAndFileHash(String userId, String hash);
 }

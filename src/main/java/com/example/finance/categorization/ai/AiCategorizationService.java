@@ -16,6 +16,7 @@ import com.example.finance.categorization.ai.AiCategorizationDtos.ItemResult;
 import com.example.finance.categorization.ai.AiCategorizationDtos.Request;
 import com.example.finance.category.model.Category;
 import com.example.finance.category.repository.CategoryRepository;
+import com.example.finance.common.security.CurrentUser;
 import com.example.finance.transaction.model.Transaction;
 import com.example.finance.transaction.repository.TransactionRepository;
 
@@ -45,13 +46,14 @@ public class AiCategorizationService {
     }
 
     public BatchResponse categorize(Request request) {
+        String userId = CurrentUser.id();
         validateRequest(request);
         if (!properties.isEnabled() || properties.getApiKey().isBlank()) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "AI categorization is not configured; set APP_AI_CATEGORIZATION_ENABLED and APP_AI_CATEGORIZATION_API_KEY");
         }
 
-        List<Category> categories = categoryRepository.findByActiveTrue();
+        List<Category> categories = categoryRepository.findByUserIdAndActiveTrue(userId);
         if (categories.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "No active categories are available");
         }
@@ -59,7 +61,7 @@ public class AiCategorizationService {
                 .filter(category -> category.id != null)
                 .collect(Collectors.toMap(category -> category.id, Function.identity(), (first, ignored) -> first));
 
-        List<Transaction> eligible = transactionRepository.findAll().stream()
+        List<Transaction> eligible = transactionRepository.findAllByUserId(userId).stream()
                 .filter(this::isEligible)
                 .filter(transaction -> !request.onlyDefaultCategory
                         || transaction.category == null

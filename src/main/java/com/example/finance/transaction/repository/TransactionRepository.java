@@ -10,10 +10,14 @@ import com.example.finance.transaction.model.Transaction;
 
 public interface TransactionRepository extends MongoRepository<Transaction, String> {
 
-    boolean existsByDeduplicationHash(String hash);
+    boolean existsByUserIdAndDeduplicationHash(String userId, String hash);
 
-    List<Transaction> findByTransactionDateTimeBetween(Instant start, Instant end);
+    List<Transaction> findAllByUserId(String userId);
 
-    @Query("{ '$or': [ { 'category.categoryId': null }, { 'category.source': 'DEFAULT' } ] }")
-    List<Transaction> findUncategorized();
+    java.util.Optional<Transaction> findByIdAndUserId(String id, String userId);
+
+    List<Transaction> findByUserIdAndTransactionDateTimeBetween(String userId, Instant start, Instant end);
+
+    @Query("{ 'userId': ?0, '$or': [ { 'category.categoryId': null }, { 'category.source': 'DEFAULT' } ] }")
+    List<Transaction> findUncategorizedByUserId(String userId);
 }

@@ -11,6 +11,7 @@ import com.example.finance.categorization.model.CategorizationRule;
 import com.example.finance.categorization.repository.RuleRepository;
 import com.example.finance.category.model.Category;
 import com.example.finance.category.repository.CategoryRepository;
+import com.example.finance.common.security.CurrentUser;
 import com.example.finance.merchant.model.Merchant;
 import com.example.finance.merchant.repository.MerchantRepository;
 import com.example.finance.transaction.model.Transaction;
@@ -33,7 +34,7 @@ public class CategorizationService {
     }
 
     public Transaction.CategoryInfo categorize(Transaction transaction) {
-        return categorize(transaction, ruleRepository.findByActiveTrueOrderByPriorityAsc());
+        return categorize(transaction, ruleRepository.findByUserIdAndActiveTrueOrderByPriorityAsc(CurrentUser.id()));
     }
 
     public Transaction.CategoryInfo categorize(Transaction transaction, List<CategorizationRule> rules) {
@@ -43,9 +44,9 @@ public class CategorizationService {
 
         String merchantName = normalize(transaction.counterparty == null ? "" : transaction.counterparty.originalName);
         if (!merchantName.isBlank()) {
-            Optional<Merchant> match = merchantRepository.findByNormalizedNameAndActiveTrue(merchantName);
+            Optional<Merchant> match = merchantRepository.findByUserIdAndNormalizedNameAndActiveTrue(CurrentUser.id(), merchantName);
             if (match.isEmpty()) {
-                match = merchantRepository.findByActiveTrue().stream()
+                match = merchantRepository.findByUserIdAndActiveTrue(CurrentUser.id()).stream()
                         .filter(merchant -> merchant.aliases != null
                                 && merchant.aliases.stream()
                                         .map(CategorizationService::normalize)
@@ -53,7 +54,7 @@ public class CategorizationService {
                         .findFirst();
             }
             if (match.isPresent() && match.get().defaultCategoryId != null) {
-                Category category = categoryRepository.findById(match.get().defaultCategoryId).orElse(null);
+                Category category = categoryRepository.findByIdAndUserId(match.get().defaultCategoryId, CurrentUser.id()).orElse(null);
                 if (category != null && category.active) {
                     return toCategoryInfo(category, Transaction.CategorySource.MERCHANT, null, 0.95);
                 }
@@ -70,16 +71,16 @@ public class CategorizationService {
                 continue;
             }
             if (rule.conditions.stream().allMatch(condition -> matches(transaction, condition))) {
-                Category category = categoryRepository.findById(rule.categoryId).orElse(null);
+                Category category = categoryRepository.findByIdAndUserId(rule.categoryId, CurrentUser.id()).orElse(null);
                 if (category != null && category.active) {
                     return toCategoryInfo(category, Transaction.CategorySource.RULE, rule.id, 0.9);
                 }
             }
         }
 
-        Category fallback = categoryRepository.findByNameIgnoreCase("Other")
+        Category fallback = categoryRepository.findByUserIdAndNameIgnoreCase(CurrentUser.id(), "Other")
                 .filter(category -> category.active)
-                .orElseGet(() -> categoryRepository.findByActiveTrue().stream().findFirst().orElse(null));
+                .orElseGet(() -> categoryRepository.findByUserIdAndActiveTrue(CurrentUser.id()).stream().findFirst().orElse(null));
         if (fallback == null) {
             return new Transaction.CategoryInfo();
         }

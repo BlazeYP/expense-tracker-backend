@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.finance.account.model.Account;
 import com.example.finance.account.repository.AccountRepository;
+import com.example.finance.common.security.CurrentUser;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
@@ -28,12 +29,13 @@ public class AccountController {
 
     @GetMapping
     public List<Account> findAll() {
-        return accountRepository.findAll();
+        return accountRepository.findAllByUserId(CurrentUser.id());
     }
 
     @PostMapping
     public Account create(@RequestBody Account account) {
         account.id = null;
+        account.userId = CurrentUser.id();
         account.last4 = normalizeLast4(account.last4);
         Instant now = Instant.now();
         account.updatedAt = now;
@@ -43,7 +45,7 @@ public class AccountController {
 
     @PutMapping("/{id}")
     public Account update(@PathVariable String id, @RequestBody Account account) {
-        Account existing = accountRepository.findById(id)
+        Account existing = accountRepository.findByIdAndUserId(id, CurrentUser.id())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
         existing.provider = account.provider;
         existing.bankName = account.bankName;

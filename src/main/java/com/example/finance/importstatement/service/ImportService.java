@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.finance.categorization.service.CategorizationService;
+import com.example.finance.common.security.CurrentUser;
 import com.example.finance.importstatement.model.ImportBatch;
 import com.example.finance.importstatement.parser.ParsedStatement;
 import com.example.finance.importstatement.parser.RawTransaction;
@@ -60,8 +61,9 @@ public class ImportService {
             }
 
             byte[] bytes = file.getBytes();
+            String userId = CurrentUser.id();
             String hash = sha256(bytes);
-            Optional<ImportBatch> existing = importBatchRepository.findByFileHash(hash);
+            Optional<ImportBatch> existing = importBatchRepository.findByUserIdAndFileHash(userId, hash);
             if (existing.isPresent()) {
                 ImportBatch prior = existing.get();
                 if (prior.status != ImportBatch.Status.FAILED) {
@@ -77,6 +79,7 @@ public class ImportService {
                             "Unsupported statement format; upload a GPay CSV or PDF statement"));
 
             ImportBatch batch = new ImportBatch();
+            batch.userId = userId;
             batch.source = "GPAY";
             batch.fileName = Objects.toString(file.getOriginalFilename(), "statement.csv");
             batch.fileHash = hash;
@@ -93,8 +96,8 @@ public class ImportService {
 
                 for (RawTransaction raw : statement.transactions()) {
                     try {
-                        Transaction transaction = map(raw, batch.id);
-                        if (transactionRepository.existsByDeduplicationHash(transaction.deduplicationHash)) {
+                        Transaction transaction = map(raw, batch.id, userId);
+                        if (transactionRepository.existsByUserIdAndDeduplicationHash(userId, transaction.deduplicationHash)) {
                             batch.duplicateRows++;
                             continue;
                         }
@@ -125,8 +128,9 @@ public class ImportService {
         }
     }
 
-    private Transaction map(RawTransaction raw, String batchId) {
+    private Transaction map(RawTransaction raw, String batchId, String userId) {
         Transaction transaction = new Transaction();
+        transaction.userId = userId;
         transaction.source = "GPAY";
         transaction.transactionDateTime = raw.transactionDateTime();
         transaction.type = raw.type();

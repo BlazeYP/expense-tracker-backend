@@ -31,7 +31,11 @@ Primary config lives in `src/main/resources/application.properties`.
 | `server.port` | `8080` (`PORT` env override) |
 | `app.timezone` | `Asia/Kolkata` (`APP_TIMEZONE`) |
 | `app.currency` | `INR` (`APP_CURRENCY`) |
+| `APP_AUTH_GOOGLE_CLIENT_ID` | Google OAuth web client ID; must match the UI client ID |
+| `APP_AUTH_JWT_SECRET` | Base64 encoded signing secret, at least 32 decoded bytes |
 | Multipart limits | 15 MB max file / request |
+
+Generate a signing secret with `openssl rand -base64 32`. Configure the same Google web client ID in the UI as `VITE_GOOGLE_CLIENT_ID`. The UI sends Google's ID token to `POST /api/v1/auth/google`; the backend verifies its signature, audience, expiry, and verified email before issuing a 12-hour bearer token. All feature APIs require that token. User-owned records share the configured database and include the authenticated user's internal ID; API queries scope records to that ID. Existing records without a `userId` are not assigned to an account automatically.
 
 ## Build and run
 

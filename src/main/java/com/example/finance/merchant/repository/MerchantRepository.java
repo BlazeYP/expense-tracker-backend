@@ -9,7 +9,11 @@ import com.example.finance.merchant.model.Merchant;
 
 public interface MerchantRepository extends MongoRepository<Merchant, String> {
 
-    Optional<Merchant> findByNormalizedNameAndActiveTrue(String name);
+    Optional<Merchant> findByUserIdAndNormalizedNameAndActiveTrue(String userId, String name);
 
-    List<Merchant> findByActiveTrue();
+    List<Merchant> findByUserIdAndActiveTrue(String userId);
+
+    List<Merchant> findAllByUserId(String userId);
+
+    Optional<Merchant> findByIdAndUserId(String id, String userId);
 }

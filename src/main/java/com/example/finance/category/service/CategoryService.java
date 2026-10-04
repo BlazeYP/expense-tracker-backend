@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.finance.category.model.Category;
 import com.example.finance.category.repository.CategoryRepository;
+import com.example.finance.common.security.CurrentUser;
 
 @Service
 public class CategoryService {
@@ -20,7 +21,7 @@ public class CategoryService {
     }
 
     public List<Category> findAll() {
-        return categoryRepository.findAll();
+        return categoryRepository.findAllByUserId(CurrentUser.id());
     }
 
     public Category create(Category category) {
@@ -28,6 +29,7 @@ public class CategoryService {
             throw new IllegalArgumentException("Category name is required");
         }
         category.id = null;
+        category.userId = CurrentUser.id();
         Instant now = Instant.now();
         category.createdAt = now;
         category.updatedAt = now;
@@ -35,7 +37,7 @@ public class CategoryService {
     }
 
     public Category update(String id, Category incoming) {
-        Category category = categoryRepository.findById(id)
+        Category category = categoryRepository.findByIdAndUserId(id, CurrentUser.id())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
         category.name = incoming.name;
         category.description = incoming.description;
@@ -47,7 +49,7 @@ public class CategoryService {
     }
 
     public void deactivate(String id) {
-        Category category = categoryRepository.findById(id)
+        Category category = categoryRepository.findByIdAndUserId(id, CurrentUser.id())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
         category.active = false;
         category.updatedAt = Instant.now();

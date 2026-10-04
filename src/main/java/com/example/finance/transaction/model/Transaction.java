@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("transaction_records")
@@ -14,6 +13,7 @@ public class Transaction {
 
     @Id
     public String id;
+    public String userId;
     public String source;
     public Instant transactionDateTime;
     public Type type;
@@ -27,7 +27,6 @@ public class Transaction {
     public CategoryInfo category = new CategoryInfo();
     public Categorization categorization = new Categorization();
 
-    @Indexed(unique = true)
     public String deduplicationHash;
 
     public Map<String, String> originalData = new LinkedHashMap<>();

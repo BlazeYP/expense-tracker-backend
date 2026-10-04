@@ -8,5 +8,9 @@ import com.example.finance.categorization.model.CategorizationRule;
 
 public interface RuleRepository extends MongoRepository<CategorizationRule, String> {
 
-    List<CategorizationRule> findByActiveTrueOrderByPriorityAsc();
+    List<CategorizationRule> findByUserIdAndActiveTrueOrderByPriorityAsc(String userId);
+
+    List<CategorizationRule> findAllByUserId(String userId);
+
+    java.util.Optional<CategorizationRule> findByIdAndUserId(String id, String userId);
 }

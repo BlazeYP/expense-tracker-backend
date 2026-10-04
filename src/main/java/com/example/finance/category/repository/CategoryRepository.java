@@ -9,7 +9,11 @@ import com.example.finance.category.model.Category;
 
 public interface CategoryRepository extends MongoRepository<Category, String> {
 
-    Optional<Category> findByNameIgnoreCase(String name);
+    Optional<Category> findByUserIdAndNameIgnoreCase(String userId, String name);
 
-    List<Category> findByActiveTrue();
+    List<Category> findByUserIdAndActiveTrue(String userId);
+
+    List<Category> findAllByUserId(String userId);
+
+    Optional<Category> findByIdAndUserId(String id, String userId);
 }

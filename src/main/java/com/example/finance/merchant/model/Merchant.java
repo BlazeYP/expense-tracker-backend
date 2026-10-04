@@ -12,6 +12,7 @@ public class Merchant {
 
     @Id
     public String id;
+    public String userId;
     public String originalName;
     public String normalizedName;
     public String defaultCategoryId;

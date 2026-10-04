@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finance.transaction.model.Transaction;
 import com.example.finance.transaction.repository.TransactionRepository;
+import com.example.finance.common.security.CurrentUser;
 
 @RestController
 @RequestMapping("/api/v1/analytics")
@@ -41,7 +42,7 @@ public class AnalyticsController {
         }
 
         ZoneId zoneId = ZoneId.of(timezone);
-        List<Transaction> transactions = transactionRepository.findByTransactionDateTimeBetween(
+        List<Transaction> transactions = transactionRepository.findByUserIdAndTransactionDateTimeBetween(CurrentUser.id(),
                 from.atStartOfDay(zoneId).toInstant(),
                 to.plusDays(1).atStartOfDay(zoneId).toInstant().minusNanos(1)
         );
@@ -85,7 +86,8 @@ public class AnalyticsController {
         ZoneId zoneId = ZoneId.of(timezone);
         Instant start = LocalDate.of(year, 1, 1).atStartOfDay(zoneId).toInstant();
         Instant end = LocalDate.of(year + 1, 1, 1).atStartOfDay(zoneId).toInstant();
-        List<Transaction> transactions = transactionRepository.findByTransactionDateTimeBetween(start, end.minusNanos(1));
+        List<Transaction> transactions = transactionRepository.findByUserIdAndTransactionDateTimeBetween(
+                CurrentUser.id(), start, end.minusNanos(1));
 
         Map<Month, MonthlyTotals> totalsByMonth = new java.util.EnumMap<>(Month.class);
         for (Month month : Month.values()) {
